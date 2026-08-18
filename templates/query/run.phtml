@@ -1,0 +1,45 @@
+<h1>Executar SQL - <?= e($database) ?></h1>
+
+<p><a href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/tables">&larr; Voltar para tabelas</a></p>
+
+<p class="muted">Instrucoes digitadas aqui sao executadas diretamente no banco conectado, sem restricoes adicionais. Use com cuidado.</p>
+
+<form method="post" action="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/query">
+    <?= \App\Support\Csrf::field() ?>
+    <textarea name="sql" rows="8" class="sql-editor" placeholder="SELECT * FROM ..."><?= e($sql) ?></textarea>
+    <button type="submit">Executar</button>
+</form>
+
+<?php if ($error !== null): ?>
+    <div class="alert alert-error"><?= e($error) ?></div>
+<?php endif; ?>
+
+<?php if ($result !== null): ?>
+    <?php if ($result['is_select']): ?>
+        <p class="muted"><?= count($result['rows']) ?> linha(s) retornada(s).</p>
+        <?php if ($result['rows'] !== []): ?>
+            <div class="table-scroll">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <?php foreach ($result['columns'] as $col): ?>
+                                <th><?= e($col) ?></th>
+                            <?php endforeach; ?>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($result['rows'] as $row): ?>
+                            <tr>
+                                <?php foreach ($result['columns'] as $col): ?>
+                                    <td><?= format_cell($row[$col] ?? null) ?></td>
+                                <?php endforeach; ?>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+    <?php else: ?>
+        <div class="alert alert-success"><?= $result['affected'] ?> linha(s) afetada(s).</div>
+    <?php endif; ?>
+<?php endif; ?>

@@ -1,0 +1,108 @@
+<?php
+/** @var array{columns: string[], rows: array<int, array<string, mixed>>} $result */
+$rowsBaseUrl = $baseUrl . '/tables/' . rawurlencode($table);
+
+$buildQuery = static function (array $overrides) use ($paginator, $orderBy, $orderDir, $whereFilter): string {
+    $params = array_merge([
+        'page' => $paginator->page,
+        'per_page' => $paginator->perPage,
+        'order_by' => $orderBy,
+        'order_dir' => $orderDir,
+        'where' => $whereFilter,
+    ], $overrides);
+
+    return '?' . http_build_query(array_filter($params, static fn ($v) => $v !== '' && $v !== null));
+};
+?>
+<h1><?= e($table) ?></h1>
+
+<p>
+    <a href="<?= e($baseUrl) ?>/tables">&larr; Voltar para tabelas</a>
+    &middot;
+    <a href="<?= e($rowsBaseUrl) ?>/structure">Estrutura</a>
+    &middot;
+    <a href="<?= e($rowsBaseUrl) ?>/new">Novo registro</a>
+</p>
+
+<form method="get" action="<?= e($rowsBaseUrl) ?>" class="filter-bar">
+    <label>
+        Filtro (WHERE em SQL)
+        <input type="text" name="where" value="<?= e($whereFilter) ?>" placeholder="ex: status = 'ativo'">
+    </label>
+    <label>
+        Por pagina
+        <select name="per_page">
+            <?php foreach ([10, 25, 50, 100, 200] as $option): ?>
+                <option value="<?= $option ?>" <?= $paginator->perPage === $option ? 'selected' : '' ?>><?= $option ?></option>
+            <?php endforeach; ?>
+        </select>
+    </label>
+    <input type="hidden" name="order_by" value="<?= e($orderBy) ?>">
+    <input type="hidden" name="order_dir" value="<?= e($orderDir) ?>">
+    <button type="submit">Filtrar</button>
+</form>
+
+<p class="muted"><?= $paginator->totalRows ?> registro(s) &middot; pagina <?= $paginator->page ?> de <?= $paginator->totalPages ?></p>
+
+<?php if ($result['rows'] === []): ?>
+    <p class="muted">Nenhum registro encontrado.</p>
+<?php else: ?>
+<div class="table-scroll">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <?php foreach ($result['columns'] as $col): ?>
+                    <?php
+                        $nextDir = ($orderBy === $col && $orderDir === 'ASC') ? 'DESC' : 'ASC';
+                    ?>
+                    <th>
+                        <a href="<?= e($rowsBaseUrl . $buildQuery(['order_by' => $col, 'order_dir' => $nextDir, 'page' => 1])) ?>">
+                            <?= e($col) ?><?php if ($orderBy === $col): ?> <?= $orderDir === 'ASC' ? '&uarr;' : '&darr;' ?><?php endif; ?>
+                        </a>
+                    </th>
+                <?php endforeach; ?>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($result['rows'] as $row): ?>
+                <tr>
+                    <?php foreach ($result['columns'] as $col): ?>
+                        <td><?= format_cell($row[$col] ?? null) ?></td>
+                    <?php endforeach; ?>
+                    <td class="actions">
+                        <?php if ($primaryKeys !== []): ?>
+                            <?php
+                                $pkQuery = [];
+                                foreach ($primaryKeys as $pkCol) {
+                                    $pkQuery['pk_' . $pkCol] = $row[$pkCol] ?? '';
+                                }
+                            ?>
+                            <a href="<?= e($rowsBaseUrl . '/edit?' . http_build_query($pkQuery)) ?>">Editar</a>
+                            <form method="post" action="<?= e($rowsBaseUrl . '/delete') ?>" onsubmit="return confirm('Remover este registro?');">
+                                <?= \App\Support\Csrf::field() ?>
+                                <?php foreach ($pkQuery as $name => $value): ?>
+                                    <input type="hidden" name="<?= e($name) ?>" value="<?= e($value) ?>">
+                                <?php endforeach; ?>
+                                <button type="submit" class="link-danger">Remover</button>
+                            </form>
+                        <?php else: ?>
+                            <span class="muted">sem chave primaria</span>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
+<?php endif; ?>
+
+<nav class="pagination">
+    <?php if ($paginator->hasPrevious()): ?>
+        <a href="<?= e($rowsBaseUrl . $buildQuery(['page' => $paginator->page - 1])) ?>">&laquo; Anterior</a>
+    <?php endif; ?>
+    <span>Pagina <?= $paginator->page ?> de <?= $paginator->totalPages ?></span>
+    <?php if ($paginator->hasNext()): ?>
+        <a href="<?= e($rowsBaseUrl . $buildQuery(['page' => $paginator->page + 1])) ?>">Proxima &raquo;</a>
+    <?php endif; ?>
+</nav>

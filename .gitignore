@@ -1,0 +1,5 @@
+/vendor/
+/composer.lock
+storage/sqlite/*
+!storage/sqlite/.gitkeep
+.DS_Store
