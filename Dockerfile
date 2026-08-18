@@ -17,17 +17,13 @@ RUN apt-get update \
         libsqlite3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Driver ODBC da Microsoft (necessario para sqlsrv/pdo_sqlsrv).
-# O repo "11" e usado de proposito sobre a base bookworm (12): evita um
-# conflito de pacotes conhecido do repositorio da Microsoft nessa combinacao.
-# Ref: https://github.com/microsoft/linux-package-repositories/issues/39
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-    && curl https://packages.microsoft.com/config/debian/11/prod.list > /etc/apt/sources.list.d/mssql-release.list \
-    && printf 'Package: unixodbc\nPin: origin "packages.microsoft.com"\nPin-Priority: 100\n' >> /etc/apt/preferences.d/microsoft \
-    && printf 'Package: unixodbc-dev\nPin: origin "packages.microsoft.com"\nPin-Priority: 100\n' >> /etc/apt/preferences.d/microsoft \
-    && printf 'Package: libodbc1:amd64\nPin: origin "packages.microsoft.com"\nPin-Priority: 100\n' >> /etc/apt/preferences.d/microsoft \
-    && printf 'Package: odbcinst\nPin: origin "packages.microsoft.com"\nPin-Priority: 100\n' >> /etc/apt/preferences.d/microsoft \
-    && printf 'Package: odbcinst1debian2:amd64\nPin: origin "packages.microsoft.com"\nPin-Priority: 100\n' >> /etc/apt/preferences.d/microsoft \
+# Driver ODBC da Microsoft (necessario para sqlsrv/pdo_sqlsrv). Usa o pacote
+# oficial "packages-microsoft-prod.deb" (registra o repo + chave GPG do jeito
+# atual recomendado pela Microsoft) em vez de "apt-key", que esta
+# descontinuado/quebrado nas imagens Debian mais recentes.
+RUN curl -sSL -O https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb \
+    && dpkg -i packages-microsoft-prod.deb \
+    && rm packages-microsoft-prod.deb \
     && apt-get update \
     && apt-get install -y --no-install-recommends msodbcsql18 unixodbc-dev \
     && rm -rf /var/lib/apt/lists/*
