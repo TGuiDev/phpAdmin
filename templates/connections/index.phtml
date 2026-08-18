@@ -1,0 +1,113 @@
+<h1>Conexoes</h1>
+
+<section class="card">
+    <h2>Nova conexao</h2>
+    <form method="post" action="/connections" class="form-grid" id="connection-form">
+        <?= \App\Support\Csrf::field() ?>
+
+        <label>
+            Tipo de banco
+            <select name="driver" id="driver-select" required>
+                <?php foreach ($drivers as $value => $labelText): ?>
+                    <option value="<?= e($value) ?>"><?= e($labelText) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </label>
+
+        <label>
+            Rotulo (opcional)
+            <input type="text" name="label" placeholder="Ex: Producao">
+        </label>
+
+        <label id="host-label">
+            Host
+            <input type="text" name="host" id="host-input" placeholder="127.0.0.1">
+        </label>
+
+        <label id="port-label">
+            Porta
+            <input type="number" name="port" id="port-input" placeholder="3306">
+        </label>
+
+        <label>
+            Usuario
+            <input type="text" name="username" autocomplete="off">
+        </label>
+
+        <label>
+            Senha
+            <input type="password" name="password" autocomplete="new-password">
+        </label>
+
+        <label id="database-label">
+            Database inicial (opcional)
+            <input type="text" name="database" placeholder="Deixe em branco para escolher depois">
+        </label>
+
+        <button type="submit">Conectar</button>
+    </form>
+</section>
+
+<section class="card">
+    <h2>Conexoes ativas na sessao</h2>
+    <?php if ($connections === []): ?>
+        <p class="muted">Nenhuma conexao cadastrada ainda nesta sessao.</p>
+    <?php else: ?>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Rotulo</th>
+                    <th>Tipo</th>
+                    <th>Host</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($connections as $conn): ?>
+                    <tr>
+                        <td><?= e($conn->label) ?></td>
+                        <td><?= e($drivers[$conn->driver] ?? $conn->driver) ?></td>
+                        <td><?= e($conn->host) ?></td>
+                        <td class="actions">
+                            <a href="/connections/<?= e($conn->id) ?>/databases">Ver databases</a>
+                            <form method="post" action="/connections/<?= e($conn->id) ?>/delete" onsubmit="return confirm('Remover esta conexao da sessao?');">
+                                <?= \App\Support\Csrf::field() ?>
+                                <button type="submit" class="link-danger">Remover</button>
+                            </form>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
+</section>
+
+<script>
+(function () {
+    var defaultPorts = <?= json_encode($defaultPorts, JSON_THROW_ON_ERROR) ?>;
+    var driverSelect = document.getElementById('driver-select');
+    var portInput = document.getElementById('port-input');
+    var hostLabel = document.getElementById('host-label');
+    var databaseLabel = document.getElementById('database-label');
+    var portLabel = document.getElementById('port-label');
+
+    function updateFields() {
+        var driver = driverSelect.value;
+        if (driver === 'sqlite') {
+            hostLabel.firstChild.textContent = 'Caminho do arquivo .sqlite ';
+            portLabel.style.display = 'none';
+            databaseLabel.style.display = 'none';
+        } else {
+            hostLabel.firstChild.textContent = 'Host ';
+            portLabel.style.display = '';
+            databaseLabel.style.display = '';
+            if (defaultPorts[driver]) {
+                portInput.placeholder = String(defaultPorts[driver]);
+            }
+        }
+    }
+
+    driverSelect.addEventListener('change', updateFields);
+    updateFields();
+})();
+</script>

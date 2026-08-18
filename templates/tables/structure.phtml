@@ -1,0 +1,30 @@
+<h1>Estrutura: <?= e($table) ?></h1>
+
+<p>
+    <a href="<?= e($baseUrl) ?>/tables/<?= rawurlencode($table) ?>">&larr; Ver dados</a>
+</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Coluna</th>
+            <th>Tipo</th>
+            <th>Permite NULL</th>
+            <th>Padrao</th>
+            <th>Chave primaria</th>
+            <th>Extra</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($columns as $column): ?>
+            <tr>
+                <td><?= e($column['name']) ?></td>
+                <td><?= e($column['type']) ?></td>
+                <td><?= $column['nullable'] ? 'Sim' : 'Nao' ?></td>
+                <td><?= format_cell($column['default']) ?></td>
+                <td><?= $column['is_primary_key'] ? 'Sim' : '' ?></td>
+                <td><?= e($column['extra']) ?></td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>

@@ -1,0 +1,15 @@
+<h1>Databases em <?= e($profile->label) ?></h1>
+
+<p><a href="/">&larr; Voltar para conexoes</a></p>
+
+<?php if ($databases === []): ?>
+    <p class="muted">Nenhum database encontrado.</p>
+<?php else: ?>
+    <ul class="list">
+        <?php foreach ($databases as $db): ?>
+            <li>
+                <a href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($db) ?>/tables"><?= e($db) ?></a>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+<?php endif; ?>

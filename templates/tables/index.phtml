@@ -1,0 +1,31 @@
+<h1>Tabelas em <?= e($database) ?></h1>
+
+<p>
+    <a href="/connections/<?= e($profile->id) ?>/databases">&larr; Voltar para databases</a>
+    &middot;
+    <a href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/query">Executar SQL</a>
+</p>
+
+<?php if ($tables === []): ?>
+    <p class="muted">Nenhuma tabela encontrada.</p>
+<?php else: ?>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Tabela</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($tables as $table): ?>
+                <tr>
+                    <td><?= e($table) ?></td>
+                    <td class="actions">
+                        <a href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/tables/<?= rawurlencode($table) ?>">Ver dados</a>
+                        <a href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/tables/<?= rawurlencode($table) ?>/structure">Estrutura</a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+<?php endif; ?>

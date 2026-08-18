@@ -1,0 +1,39 @@
+<?php
+$rowsBaseUrl = $baseUrl . '/tables/' . rawurlencode($table);
+
+if ($mode === 'edit') {
+    $pkQuery = [];
+    foreach ($primaryKeyValues as $col => $value) {
+        $pkQuery['pk_' . $col] = $value;
+    }
+    $actionUrl = $rowsBaseUrl . '/update?' . http_build_query($pkQuery);
+} else {
+    $actionUrl = $rowsBaseUrl . '/rows';
+}
+?>
+<h1><?= $mode === 'edit' ? 'Editar registro' : 'Novo registro' ?> - <?= e($table) ?></h1>
+
+<p><a href="<?= e($rowsBaseUrl) ?>">&larr; Voltar</a></p>
+
+<form method="post" action="<?= e($actionUrl) ?>" class="form-grid">
+    <?= \App\Support\Csrf::field() ?>
+
+    <?php foreach ($columns as $column): ?>
+        <?php
+            $name = $column['name'];
+            $value = $row[$name] ?? '';
+            $isAutoIncrement = str_contains(strtolower($column['extra'] ?? ''), 'auto_increment');
+        ?>
+        <label>
+            <?= e($name) ?>
+            <span class="hint"><?= e($column['type']) ?><?= $column['nullable'] ? ' &middot; NULL permitido' : '' ?></span>
+            <?php if ($isAutoIncrement): ?>
+                <input type="text" value="<?= $mode === 'edit' ? format_cell($value) : '(gerado automaticamente)' ?>" disabled>
+            <?php else: ?>
+                <input type="text" name="field_<?= e($name) ?>" value="<?= e($value === null ? '' : (string) $value) ?>">
+            <?php endif; ?>
+        </label>
+    <?php endforeach; ?>
+
+    <button type="submit"><?= $mode === 'edit' ? 'Salvar alteracoes' : 'Inserir' ?></button>
+</form>
