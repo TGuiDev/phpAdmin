@@ -8,8 +8,14 @@
 
 <form method="post" action="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/query" id="sql-form">
     <?= \App\Support\Csrf::field() ?>
-    <div id="sql-editor" class="mb-3 overflow-hidden rounded-md border border-input"></div>
-    <input type="hidden" name="sql" id="sql-hidden" value="<?= e($sql) ?>">
+    <textarea
+        name="sql"
+        id="sql-textarea"
+        rows="10"
+        placeholder="SELECT * FROM ..."
+        class="mb-3 w-full rounded-md border border-input bg-transparent p-3 font-mono text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+    ><?= e($sql) ?></textarea>
+    <div id="sql-editor" class="mb-3 hidden overflow-hidden rounded-md border border-input"></div>
     <button type="submit" class="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90">Executar</button>
 </form>
 
@@ -61,24 +67,32 @@
     import { EditorView, basicSetup } from 'codemirror';
     import { sql } from '@codemirror/lang-sql';
 
-    const schema = <?= json_encode($schema ?? [], JSON_THROW_ON_ERROR) ?>;
-    const hidden = document.getElementById('sql-hidden');
+    try {
+        const schema = <?= json_encode($schema ?? [], JSON_THROW_ON_ERROR) ?>;
+        const textarea = document.getElementById('sql-textarea');
+        const container = document.getElementById('sql-editor');
 
-    const view = new EditorView({
-        doc: hidden.value,
-        extensions: [
-            basicSetup,
-            sql({ schema }),
-            EditorView.theme({
-                '&': { fontSize: '0.85rem', backgroundColor: 'transparent' },
-                '.cm-content': { fontFamily: 'Consolas, Menlo, monospace', minHeight: '10rem' },
-                '.cm-gutters': { backgroundColor: 'transparent', border: 'none' },
-            }, { dark: true }),
-        ],
-        parent: document.getElementById('sql-editor'),
-    });
+        const view = new EditorView({
+            doc: textarea.value,
+            extensions: [
+                basicSetup,
+                sql({ schema }),
+                EditorView.theme({
+                    '&': { fontSize: '0.85rem', backgroundColor: 'transparent' },
+                    '.cm-content': { fontFamily: 'Consolas, Menlo, monospace', minHeight: '10rem' },
+                    '.cm-gutters': { backgroundColor: 'transparent', border: 'none' },
+                }, { dark: true }),
+            ],
+            parent: container,
+        });
 
-    document.getElementById('sql-form').addEventListener('submit', () => {
-        hidden.value = view.state.doc.toString();
-    });
+        textarea.classList.add('hidden');
+        container.classList.remove('hidden');
+
+        document.getElementById('sql-form').addEventListener('submit', () => {
+            textarea.value = view.state.doc.toString();
+        });
+    } catch (err) {
+        console.error('Nao foi possivel carregar o editor CodeMirror, usando textarea simples.', err);
+    }
 </script>
