@@ -1,31 +1,40 @@
-<h1>Tabelas em <?= e($database) ?></h1>
-
-<p>
-    <a href="/connections/<?= e($profile->id) ?>/databases">&larr; Voltar para databases</a>
-    &middot;
-    <a href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/query">Executar SQL</a>
+<h1 class="mb-1 text-xl font-semibold">Tabelas em <?= e($database) ?></h1>
+<p class="mb-4 flex items-center gap-3 text-sm">
+    <a href="/connections/<?= e($profile->id) ?>/databases" class="text-primary hover:underline">&larr; Voltar para databases</a>
+    <span class="text-muted-foreground">&middot;</span>
+    <a href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/query" class="text-primary hover:underline">Executar SQL</a>
 </p>
 
 <?php if ($tables === []): ?>
-    <p class="muted">Nenhuma tabela encontrada.</p>
+    <p class="text-sm text-muted-foreground">Nenhuma tabela encontrada.</p>
 <?php else: ?>
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th>Tabela</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($tables as $table): ?>
-                <tr>
-                    <td><?= e($table) ?></td>
-                    <td class="actions">
-                        <a href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/tables/<?= rawurlencode($table) ?>">Ver dados</a>
-                        <a href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/tables/<?= rawurlencode($table) ?>/structure">Estrutura</a>
-                    </td>
+    <div class="overflow-x-auto rounded-lg border border-border bg-card shadow-sm">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border text-left text-muted-foreground">
+                    <th class="px-4 py-2 font-medium">Tabela</th>
+                    <th class="px-4 py-2 font-medium"></th>
                 </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <?php foreach ($tables as $table): ?>
+                    <tr class="border-b border-border last:border-0 hover:bg-muted/50">
+                        <td class="px-4 py-2 font-medium"><?= e($table) ?></td>
+                        <td class="px-4 py-2">
+                            <div class="flex items-center gap-2">
+                                <a
+                                    href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/tables/<?= rawurlencode($table) ?>"
+                                    class="rounded-md border border-input px-3 py-1.5 text-xs font-medium hover:bg-muted"
+                                >Ver dados</a>
+                                <a
+                                    href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/tables/<?= rawurlencode($table) ?>/structure"
+                                    class="rounded-md border border-input px-3 py-1.5 text-xs font-medium hover:bg-muted"
+                                >Estrutura</a>
+                            </div>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
 <?php endif; ?>

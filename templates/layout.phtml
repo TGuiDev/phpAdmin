@@ -1,35 +1,62 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?= e($title ?? 'DB Manager') ?></title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        darkMode: 'class',
+        theme: {
+            extend: {
+                colors: {
+                    border: '#2a2f3a',
+                    input: '#2a2f3a',
+                    background: '#0f1115',
+                    foreground: '#e6e8ec',
+                    card: '#171a21',
+                    'card-foreground': '#e6e8ec',
+                    muted: '#1f232c',
+                    'muted-foreground': '#9aa1ad',
+                    primary: '#4f8cff',
+                    'primary-foreground': '#ffffff',
+                    destructive: '#ef5a5a',
+                    'destructive-foreground': '#ffffff',
+                    success: '#3fbf6f',
+                },
+            },
+        },
+    };
+</script>
 <link rel="stylesheet" href="/assets/css/app.css">
 </head>
-<body>
-<header class="topbar">
-    <a class="brand" href="/">DB Manager</a>
+<body class="bg-background text-foreground text-sm">
+<header class="flex items-center gap-4 border-b border-border bg-card px-6 py-3">
+    <a class="font-bold text-base text-foreground" href="/">DB Manager</a>
     <?php if (isset($profile)): ?>
-        <nav class="breadcrumb">
-            <span class="conn-label"><?= e($profile->label) ?></span>
+        <nav class="flex items-center gap-1.5 text-muted-foreground">
+            <span class="font-semibold text-foreground"><?= e($profile->label) ?></span>
             <?php if (isset($database)): ?>
-                <span class="sep">/</span>
-                <a href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/tables"><?= e($database) ?></a>
+                <span>/</span>
+                <a class="hover:text-primary" href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/tables"><?= e($database) ?></a>
             <?php endif; ?>
             <?php if (isset($table)): ?>
-                <span class="sep">/</span>
-                <span><?= e($table) ?></span>
+                <span>/</span>
+                <span class="text-foreground"><?= e($table) ?></span>
             <?php endif; ?>
         </nav>
     <?php endif; ?>
 </header>
 
-<div class="app-shell">
+<div class="flex min-h-[calc(100vh-3.2rem)] flex-col md:flex-row">
     <?php include __DIR__ . '/partials/sidebar.phtml'; ?>
 
-    <main class="container">
+    <main class="flex-1 min-w-0 p-6">
         <?php foreach (\App\Support\Flash::pull() as $message): ?>
-            <div class="alert alert-<?= e($message['type']) ?>"><?= e($message['message']) ?></div>
+            <div class="mb-4 rounded-md border px-3 py-2 text-sm <?= $message['type'] === 'error' ? 'border-destructive/40 bg-destructive/10 text-destructive' : 'border-success/40 bg-success/10 text-success' ?>">
+                <?= e($message['message']) ?>
+            </div>
         <?php endforeach; ?>
 
         <?= $content ?>

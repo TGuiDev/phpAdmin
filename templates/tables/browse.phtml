@@ -14,24 +14,24 @@ $buildQuery = static function (array $overrides) use ($paginator, $orderBy, $ord
     return '?' . http_build_query(array_filter($params, static fn ($v) => $v !== '' && $v !== null));
 };
 ?>
-<h1><?= e($table) ?></h1>
+<h1 class="mb-1 text-xl font-semibold"><?= e($table) ?></h1>
 
-<p>
-    <a href="<?= e($baseUrl) ?>/tables">&larr; Voltar para tabelas</a>
-    &middot;
-    <a href="<?= e($rowsBaseUrl) ?>/structure">Estrutura</a>
-    &middot;
-    <a href="<?= e($rowsBaseUrl) ?>/new">Novo registro</a>
+<p class="mb-4 flex items-center gap-3 text-sm">
+    <a href="<?= e($baseUrl) ?>/tables" class="text-primary hover:underline">&larr; Voltar para tabelas</a>
+    <span class="text-muted-foreground">&middot;</span>
+    <a href="<?= e($rowsBaseUrl) ?>/structure" class="text-primary hover:underline">Estrutura</a>
+    <span class="text-muted-foreground">&middot;</span>
+    <a href="<?= e($rowsBaseUrl) ?>/new" class="text-primary hover:underline">Novo registro</a>
 </p>
 
-<form method="get" action="<?= e($rowsBaseUrl) ?>" class="filter-bar">
-    <label>
+<form method="get" action="<?= e($rowsBaseUrl) ?>" class="mb-4 flex flex-wrap items-end gap-4 rounded-lg border border-border bg-card p-4 shadow-sm">
+    <label class="flex flex-col gap-1 text-sm text-muted-foreground">
         Filtro (WHERE em SQL)
-        <input type="text" name="where" value="<?= e($whereFilter) ?>" placeholder="ex: status = 'ativo'">
+        <input type="text" name="where" value="<?= e($whereFilter) ?>" placeholder="ex: status = 'ativo'" class="h-9 w-64 rounded-md border border-input bg-transparent px-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary">
     </label>
-    <label>
+    <label class="flex flex-col gap-1 text-sm text-muted-foreground">
         Por pagina
-        <select name="per_page">
+        <select name="per_page" class="h-9 rounded-md border border-input bg-transparent px-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary">
             <?php foreach ([10, 25, 50, 100, 200] as $option): ?>
                 <option value="<?= $option ?>" <?= $paginator->perPage === $option ? 'selected' : '' ?>><?= $option ?></option>
             <?php endforeach; ?>
@@ -39,38 +39,38 @@ $buildQuery = static function (array $overrides) use ($paginator, $orderBy, $ord
     </label>
     <input type="hidden" name="order_by" value="<?= e($orderBy) ?>">
     <input type="hidden" name="order_dir" value="<?= e($orderDir) ?>">
-    <button type="submit">Filtrar</button>
+    <button type="submit" class="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90">Filtrar</button>
 </form>
 
-<p class="muted"><?= $paginator->totalRows ?> registro(s) &middot; pagina <?= $paginator->page ?> de <?= $paginator->totalPages ?></p>
+<p class="mb-3 text-sm text-muted-foreground"><?= $paginator->totalRows ?> registro(s) &middot; pagina <?= $paginator->page ?> de <?= $paginator->totalPages ?></p>
 
 <?php if ($result['rows'] === []): ?>
-    <p class="muted">Nenhum registro encontrado.</p>
+    <p class="text-sm text-muted-foreground">Nenhum registro encontrado.</p>
 <?php else: ?>
-<div class="table-scroll">
-    <table class="data-table">
+<div class="overflow-x-auto rounded-lg border border-border bg-card shadow-sm">
+    <table class="w-full text-sm">
         <thead>
-            <tr>
+            <tr class="border-b border-border text-left text-muted-foreground">
                 <?php foreach ($result['columns'] as $col): ?>
                     <?php
                         $nextDir = ($orderBy === $col && $orderDir === 'ASC') ? 'DESC' : 'ASC';
                     ?>
-                    <th>
-                        <a href="<?= e($rowsBaseUrl . $buildQuery(['order_by' => $col, 'order_dir' => $nextDir, 'page' => 1])) ?>">
+                    <th class="whitespace-nowrap px-4 py-2 font-medium">
+                        <a href="<?= e($rowsBaseUrl . $buildQuery(['order_by' => $col, 'order_dir' => $nextDir, 'page' => 1])) ?>" class="hover:text-primary">
                             <?= e($col) ?><?php if ($orderBy === $col): ?> <?= $orderDir === 'ASC' ? '&uarr;' : '&darr;' ?><?php endif; ?>
                         </a>
                     </th>
                 <?php endforeach; ?>
-                <th></th>
+                <th class="px-4 py-2"></th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($result['rows'] as $row): ?>
-                <tr>
+                <tr class="border-b border-border last:border-0 hover:bg-muted/50">
                     <?php foreach ($result['columns'] as $col): ?>
-                        <td><?= format_cell($row[$col] ?? null) ?></td>
+                        <td class="whitespace-nowrap px-4 py-2"><?= format_cell($row[$col] ?? null) ?></td>
                     <?php endforeach; ?>
-                    <td class="actions">
+                    <td class="whitespace-nowrap px-4 py-2">
                         <?php if ($primaryKeys !== []): ?>
                             <?php
                                 $pkQuery = [];
@@ -78,16 +78,18 @@ $buildQuery = static function (array $overrides) use ($paginator, $orderBy, $ord
                                     $pkQuery['pk_' . $pkCol] = $row[$pkCol] ?? '';
                                 }
                             ?>
-                            <a href="<?= e($rowsBaseUrl . '/edit?' . http_build_query($pkQuery)) ?>">Editar</a>
-                            <form method="post" action="<?= e($rowsBaseUrl . '/delete') ?>" onsubmit="return confirm('Remover este registro?');">
-                                <?= \App\Support\Csrf::field() ?>
-                                <?php foreach ($pkQuery as $name => $value): ?>
-                                    <input type="hidden" name="<?= e($name) ?>" value="<?= e($value) ?>">
-                                <?php endforeach; ?>
-                                <button type="submit" class="link-danger">Remover</button>
-                            </form>
+                            <div class="flex items-center gap-3">
+                                <a href="<?= e($rowsBaseUrl . '/edit?' . http_build_query($pkQuery)) ?>" class="text-primary hover:underline">Editar</a>
+                                <form method="post" action="<?= e($rowsBaseUrl . '/delete') ?>" onsubmit="return confirm('Remover este registro?');">
+                                    <?= \App\Support\Csrf::field() ?>
+                                    <?php foreach ($pkQuery as $name => $value): ?>
+                                        <input type="hidden" name="<?= e($name) ?>" value="<?= e($value) ?>">
+                                    <?php endforeach; ?>
+                                    <button type="submit" class="text-destructive hover:underline">Remover</button>
+                                </form>
+                            </div>
                         <?php else: ?>
-                            <span class="muted">sem chave primaria</span>
+                            <span class="text-muted-foreground">sem chave primaria</span>
                         <?php endif; ?>
                     </td>
                 </tr>
@@ -97,12 +99,12 @@ $buildQuery = static function (array $overrides) use ($paginator, $orderBy, $ord
 </div>
 <?php endif; ?>
 
-<nav class="pagination">
+<nav class="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
     <?php if ($paginator->hasPrevious()): ?>
-        <a href="<?= e($rowsBaseUrl . $buildQuery(['page' => $paginator->page - 1])) ?>">&laquo; Anterior</a>
+        <a href="<?= e($rowsBaseUrl . $buildQuery(['page' => $paginator->page - 1])) ?>" class="rounded-md border border-input px-3 py-1.5 hover:bg-muted">&laquo; Anterior</a>
     <?php endif; ?>
     <span>Pagina <?= $paginator->page ?> de <?= $paginator->totalPages ?></span>
     <?php if ($paginator->hasNext()): ?>
-        <a href="<?= e($rowsBaseUrl . $buildQuery(['page' => $paginator->page + 1])) ?>">Proxima &raquo;</a>
+        <a href="<?= e($rowsBaseUrl . $buildQuery(['page' => $paginator->page + 1])) ?>" class="rounded-md border border-input px-3 py-1.5 hover:bg-muted">Proxima &raquo;</a>
     <?php endif; ?>
 </nav>

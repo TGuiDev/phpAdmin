@@ -1,37 +1,40 @@
-<h1>Executar SQL - <?= e($database) ?></h1>
+<h1 class="mb-1 text-xl font-semibold">Executar SQL - <?= e($database) ?></h1>
 
-<p><a href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/tables">&larr; Voltar para tabelas</a></p>
+<p class="mb-2 text-sm">
+    <a href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/tables" class="text-primary hover:underline">&larr; Voltar para tabelas</a>
+</p>
 
-<p class="muted">Instrucoes digitadas aqui sao executadas diretamente no banco conectado, sem restricoes adicionais. Use com cuidado.</p>
+<p class="mb-4 text-sm text-muted-foreground">Instrucoes digitadas aqui sao executadas diretamente no banco conectado, sem restricoes adicionais. Use com cuidado.</p>
 
-<form method="post" action="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/query">
+<form method="post" action="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/query" id="sql-form">
     <?= \App\Support\Csrf::field() ?>
-    <textarea name="sql" rows="8" class="sql-editor" placeholder="SELECT * FROM ..."><?= e($sql) ?></textarea>
-    <button type="submit">Executar</button>
+    <div id="sql-editor" class="mb-3 overflow-hidden rounded-md border border-input"></div>
+    <input type="hidden" name="sql" id="sql-hidden" value="<?= e($sql) ?>">
+    <button type="submit" class="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90">Executar</button>
 </form>
 
 <?php if ($error !== null): ?>
-    <div class="alert alert-error"><?= e($error) ?></div>
+    <div class="mt-4 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive"><?= e($error) ?></div>
 <?php endif; ?>
 
 <?php if ($result !== null): ?>
     <?php if ($result['is_select']): ?>
-        <p class="muted"><?= count($result['rows']) ?> linha(s) retornada(s).</p>
+        <p class="mt-4 mb-2 text-sm text-muted-foreground"><?= count($result['rows']) ?> linha(s) retornada(s).</p>
         <?php if ($result['rows'] !== []): ?>
-            <div class="table-scroll">
-                <table class="data-table">
+            <div class="overflow-x-auto rounded-lg border border-border bg-card shadow-sm">
+                <table class="w-full text-sm">
                     <thead>
-                        <tr>
+                        <tr class="border-b border-border text-left text-muted-foreground">
                             <?php foreach ($result['columns'] as $col): ?>
-                                <th><?= e($col) ?></th>
+                                <th class="whitespace-nowrap px-4 py-2 font-medium"><?= e($col) ?></th>
                             <?php endforeach; ?>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($result['rows'] as $row): ?>
-                            <tr>
+                            <tr class="border-b border-border last:border-0 hover:bg-muted/50">
                                 <?php foreach ($result['columns'] as $col): ?>
-                                    <td><?= format_cell($row[$col] ?? null) ?></td>
+                                    <td class="whitespace-nowrap px-4 py-2"><?= format_cell($row[$col] ?? null) ?></td>
                                 <?php endforeach; ?>
                             </tr>
                         <?php endforeach; ?>
@@ -40,6 +43,42 @@
             </div>
         <?php endif; ?>
     <?php else: ?>
-        <div class="alert alert-success"><?= $result['affected'] ?> linha(s) afetada(s).</div>
+        <div class="mt-4 rounded-md border border-success/40 bg-success/10 px-3 py-2 text-sm text-success"><?= $result['affected'] ?> linha(s) afetada(s).</div>
     <?php endif; ?>
 <?php endif; ?>
+
+<script type="importmap">
+{
+    "imports": {
+        "codemirror": "https://esm.sh/codemirror@6",
+        "@codemirror/lang-sql": "https://esm.sh/@codemirror/lang-sql@6",
+        "@codemirror/state": "https://esm.sh/@codemirror/state@6",
+        "@codemirror/view": "https://esm.sh/@codemirror/view@6"
+    }
+}
+</script>
+<script type="module">
+    import { EditorView, basicSetup } from 'codemirror';
+    import { sql } from '@codemirror/lang-sql';
+
+    const schema = <?= json_encode($schema ?? [], JSON_THROW_ON_ERROR) ?>;
+    const hidden = document.getElementById('sql-hidden');
+
+    const view = new EditorView({
+        doc: hidden.value,
+        extensions: [
+            basicSetup,
+            sql({ schema }),
+            EditorView.theme({
+                '&': { fontSize: '0.85rem', backgroundColor: 'transparent' },
+                '.cm-content': { fontFamily: 'Consolas, Menlo, monospace', minHeight: '10rem' },
+                '.cm-gutters': { backgroundColor: 'transparent', border: 'none' },
+            }, { dark: true }),
+        ],
+        parent: document.getElementById('sql-editor'),
+    });
+
+    document.getElementById('sql-form').addEventListener('submit', () => {
+        hidden.value = view.state.doc.toString();
+    });
+</script>

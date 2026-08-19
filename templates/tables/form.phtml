@@ -11,11 +11,11 @@ if ($mode === 'edit') {
     $actionUrl = $rowsBaseUrl . '/rows';
 }
 ?>
-<h1><?= $mode === 'edit' ? 'Editar registro' : 'Novo registro' ?> - <?= e($table) ?></h1>
+<h1 class="mb-1 text-xl font-semibold"><?= $mode === 'edit' ? 'Editar registro' : 'Novo registro' ?> - <?= e($table) ?></h1>
 
-<p><a href="<?= e($rowsBaseUrl) ?>">&larr; Voltar</a></p>
+<p class="mb-4 text-sm"><a href="<?= e($rowsBaseUrl) ?>" class="text-primary hover:underline">&larr; Voltar</a></p>
 
-<form method="post" action="<?= e($actionUrl) ?>" class="form-grid">
+<form method="post" action="<?= e($actionUrl) ?>" class="grid grid-cols-1 gap-4 rounded-lg border border-border bg-card p-6 shadow-sm sm:grid-cols-2 lg:grid-cols-3">
     <?= \App\Support\Csrf::field() ?>
 
     <?php foreach ($columns as $column): ?>
@@ -24,16 +24,18 @@ if ($mode === 'edit') {
             $value = $row[$name] ?? '';
             $isAutoIncrement = str_contains(strtolower($column['extra'] ?? ''), 'auto_increment');
         ?>
-        <label>
+        <label class="flex flex-col gap-1 text-sm text-muted-foreground">
             <?= e($name) ?>
-            <span class="hint"><?= e($column['type']) ?><?= $column['nullable'] ? ' &middot; NULL permitido' : '' ?></span>
+            <span class="text-xs text-muted-foreground"><?= e($column['type']) ?><?= $column['nullable'] ? ' &middot; NULL permitido' : '' ?></span>
             <?php if ($isAutoIncrement): ?>
-                <input type="text" value="<?= $mode === 'edit' ? format_cell($value) : '(gerado automaticamente)' ?>" disabled>
+                <input type="text" value="<?= $mode === 'edit' ? format_cell($value) : '(gerado automaticamente)' ?>" disabled class="h-9 rounded-md border border-input bg-transparent px-3 text-sm text-foreground opacity-60">
             <?php else: ?>
-                <input type="text" name="field_<?= e($name) ?>" value="<?= e($value === null ? '' : (string) $value) ?>">
+                <input type="text" name="field_<?= e($name) ?>" value="<?= e($value === null ? '' : (string) $value) ?>" class="h-9 rounded-md border border-input bg-transparent px-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary">
             <?php endif; ?>
         </label>
     <?php endforeach; ?>
 
-    <button type="submit"><?= $mode === 'edit' ? 'Salvar alteracoes' : 'Inserir' ?></button>
+    <div class="col-span-full">
+        <button type="submit" class="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"><?= $mode === 'edit' ? 'Salvar alteracoes' : 'Inserir' ?></button>
+    </div>
 </form>

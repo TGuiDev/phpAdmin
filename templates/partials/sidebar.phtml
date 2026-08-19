@@ -1,15 +1,19 @@
-<aside class="sidebar">
-    <div class="sidebar-section">
-        <h2>Conexoes</h2>
-        <ul class="sidebar-tree">
+<aside class="w-full shrink-0 border-b border-border bg-card p-4 md:w-64 md:border-b-0 md:border-r md:overflow-y-auto md:sticky md:top-0 md:h-[calc(100vh-3.2rem)]">
+    <div>
+        <h2 class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Conexoes</h2>
+        <ul class="space-y-0.5">
             <?php if (($connections ?? []) === []): ?>
-                <li class="sidebar-empty">Nenhuma conexao salva</li>
+                <li class="rounded-md px-2 py-1.5 text-sm italic text-muted-foreground">Nenhuma conexao salva</li>
             <?php else: ?>
                 <?php foreach ($connections as $connection): ?>
-                    <li class="<?= isset($profile) && $profile->id === $connection->id ? 'active' : '' ?>">
-                        <a href="/connections/<?= e($connection->id) ?>/databases">
-                            <?= e($connection->label) ?>
-                            <span class="sidebar-tag"><?= e($connection->driver) ?></span>
+                    <?php $isActive = isset($profile) && $profile->id === $connection->id; ?>
+                    <li>
+                        <a
+                            href="/connections/<?= e($connection->id) ?>/databases"
+                            class="flex items-center justify-between gap-2 rounded-md px-2 py-1.5 text-sm truncate <?= $isActive ? 'bg-primary/15 font-medium text-primary' : 'text-foreground hover:bg-muted' ?>"
+                        >
+                            <span class="truncate"><?= e($connection->label) ?></span>
+                            <span class="shrink-0 rounded border border-border px-1.5 py-0.5 text-[0.65rem] uppercase text-muted-foreground"><?= e($connection->driver) ?></span>
                         </a>
                     </li>
                 <?php endforeach; ?>
@@ -18,15 +22,19 @@
     </div>
 
     <?php if (isset($profile)): ?>
-        <div class="sidebar-section">
-            <h2>Databases</h2>
-            <ul class="sidebar-tree sidebar-tree--nested">
+        <div class="mt-5">
+            <h2 class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Databases</h2>
+            <ul class="ml-2 space-y-0.5 border-l border-border pl-2">
                 <?php if (($databases ?? []) === []): ?>
-                    <li class="sidebar-empty">Nenhum database</li>
+                    <li class="rounded-md px-2 py-1.5 text-sm italic text-muted-foreground">Nenhum database</li>
                 <?php else: ?>
                     <?php foreach ($databases as $db): ?>
-                        <li class="<?= isset($database) && $database === $db ? 'active' : '' ?>">
-                            <a href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($db) ?>/tables"><?= e($db) ?></a>
+                        <?php $isActive = isset($database) && $database === $db; ?>
+                        <li>
+                            <a
+                                href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($db) ?>/tables"
+                                class="block truncate rounded-md px-2 py-1.5 text-sm <?= $isActive ? 'bg-primary/15 font-medium text-primary' : 'text-foreground hover:bg-muted' ?>"
+                            ><?= e($db) ?></a>
                         </li>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -35,18 +43,25 @@
     <?php endif; ?>
 
     <?php if (isset($profile) && isset($database)): ?>
-        <div class="sidebar-section">
-            <h2>Tabelas</h2>
-            <p class="sidebar-action">
-                <a href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/query">Executar SQL</a>
-            </p>
-            <ul class="sidebar-tree sidebar-tree--nested">
+        <div class="mt-5">
+            <div class="mb-2 flex items-center justify-between">
+                <h2 class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Tabelas</h2>
+                <a
+                    href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/query"
+                    class="text-xs font-medium text-primary hover:underline"
+                >SQL</a>
+            </div>
+            <ul class="ml-2 space-y-0.5 border-l border-border pl-2">
                 <?php if (($tables ?? []) === []): ?>
-                    <li class="sidebar-empty">Nenhuma tabela</li>
+                    <li class="rounded-md px-2 py-1.5 text-sm italic text-muted-foreground">Nenhuma tabela</li>
                 <?php else: ?>
                     <?php foreach ($tables as $t): ?>
-                        <li class="<?= isset($table) && $table === $t ? 'active' : '' ?>">
-                            <a href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/tables/<?= rawurlencode($t) ?>"><?= e($t) ?></a>
+                        <?php $isActive = isset($table) && $table === $t; ?>
+                        <li>
+                            <a
+                                href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/tables/<?= rawurlencode($t) ?>"
+                                class="block truncate rounded-md px-2 py-1.5 text-sm <?= $isActive ? 'bg-primary/15 font-medium text-primary' : 'text-foreground hover:bg-muted' ?>"
+                            ><?= e($t) ?></a>
                         </li>
                     <?php endforeach; ?>
                 <?php endif; ?>
