@@ -1,30 +1,32 @@
-<h1>Estrutura: <?= e($table) ?></h1>
+<h1 class="mb-1 text-xl font-semibold">Estrutura: <?= e($table) ?></h1>
 
-<p>
-    <a href="<?= e($baseUrl) ?>/tables/<?= rawurlencode($table) ?>">&larr; Ver dados</a>
+<p class="mb-4 text-sm">
+    <a href="<?= e($baseUrl) ?>/tables/<?= rawurlencode($table) ?>" class="text-primary hover:underline">&larr; Ver dados</a>
 </p>
 
-<table class="data-table">
-    <thead>
-        <tr>
-            <th>Coluna</th>
-            <th>Tipo</th>
-            <th>Permite NULL</th>
-            <th>Padrao</th>
-            <th>Chave primaria</th>
-            <th>Extra</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($columns as $column): ?>
-            <tr>
-                <td><?= e($column['name']) ?></td>
-                <td><?= e($column['type']) ?></td>
-                <td><?= $column['nullable'] ? 'Sim' : 'Nao' ?></td>
-                <td><?= format_cell($column['default']) ?></td>
-                <td><?= $column['is_primary_key'] ? 'Sim' : '' ?></td>
-                <td><?= e($column['extra']) ?></td>
+<div class="overflow-x-auto rounded-lg border border-border bg-card shadow-sm">
+    <table class="w-full text-sm">
+        <thead>
+            <tr class="border-b border-border text-left text-muted-foreground">
+                <th class="px-4 py-2 font-medium">Coluna</th>
+                <th class="px-4 py-2 font-medium">Tipo</th>
+                <th class="px-4 py-2 font-medium">Permite NULL</th>
+                <th class="px-4 py-2 font-medium">Padrao</th>
+                <th class="px-4 py-2 font-medium">Chave primaria</th>
+                <th class="px-4 py-2 font-medium">Extra</th>
             </tr>
-        <?php endforeach; ?>
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            <?php foreach ($columns as $column): ?>
+                <tr class="border-b border-border last:border-0 hover:bg-muted/50">
+                    <td class="px-4 py-2 font-medium"><?= e($column['name']) ?></td>
+                    <td class="px-4 py-2 text-muted-foreground"><?= e($column['type']) ?></td>
+                    <td class="px-4 py-2"><?= $column['nullable'] ? 'Sim' : 'Nao' ?></td>
+                    <td class="px-4 py-2"><?= format_cell($column['default']) ?></td>
+                    <td class="px-4 py-2"><?= $column['is_primary_key'] ? 'Sim' : '' ?></td>
+                    <td class="px-4 py-2 text-muted-foreground"><?= e($column['extra']) ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>

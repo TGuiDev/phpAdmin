@@ -1,84 +1,92 @@
-<h1>Conexoes</h1>
+<h1 class="mb-4 text-xl font-semibold">Conexoes</h1>
 
-<section class="card">
-    <h2>Nova conexao</h2>
-    <form method="post" action="/connections" class="form-grid" id="connection-form">
+<section class="mb-6 rounded-lg border border-border bg-card p-6 shadow-sm">
+    <h2 class="mb-4 text-base font-semibold">Nova conexao</h2>
+    <form method="post" action="/connections" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" id="connection-form">
         <?= \App\Support\Csrf::field() ?>
 
-        <label>
+        <label class="flex flex-col gap-1 text-sm text-muted-foreground">
             Tipo de banco
-            <select name="driver" id="driver-select" required>
+            <select name="driver" id="driver-select" required class="h-9 rounded-md border border-input bg-transparent px-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary">
                 <?php foreach ($drivers as $value => $labelText): ?>
                     <option value="<?= e($value) ?>"><?= e($labelText) ?></option>
                 <?php endforeach; ?>
             </select>
         </label>
 
-        <label>
+        <label class="flex flex-col gap-1 text-sm text-muted-foreground">
             Rotulo (opcional)
-            <input type="text" name="label" placeholder="Ex: Producao">
+            <input type="text" name="label" placeholder="Ex: Producao" class="h-9 rounded-md border border-input bg-transparent px-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary">
         </label>
 
-        <label id="host-label">
+        <label class="flex flex-col gap-1 text-sm text-muted-foreground" id="host-label">
             Host
-            <input type="text" name="host" id="host-input" placeholder="127.0.0.1">
+            <input type="text" name="host" id="host-input" placeholder="127.0.0.1" class="h-9 rounded-md border border-input bg-transparent px-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary">
         </label>
 
-        <label id="port-label">
+        <label class="flex flex-col gap-1 text-sm text-muted-foreground" id="port-label">
             Porta
-            <input type="number" name="port" id="port-input" placeholder="3306">
+            <input type="number" name="port" id="port-input" placeholder="3306" class="h-9 rounded-md border border-input bg-transparent px-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary">
         </label>
 
-        <label>
+        <label class="flex flex-col gap-1 text-sm text-muted-foreground">
             Usuario
-            <input type="text" name="username" autocomplete="off">
+            <input type="text" name="username" autocomplete="off" class="h-9 rounded-md border border-input bg-transparent px-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary">
         </label>
 
-        <label>
+        <label class="flex flex-col gap-1 text-sm text-muted-foreground">
             Senha
-            <input type="password" name="password" autocomplete="new-password">
+            <input type="password" name="password" autocomplete="new-password" class="h-9 rounded-md border border-input bg-transparent px-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary">
         </label>
 
-        <label id="database-label">
+        <label class="flex flex-col gap-1 text-sm text-muted-foreground" id="database-label">
             Database inicial (opcional)
-            <input type="text" name="database" placeholder="Deixe em branco para escolher depois">
+            <input type="text" name="database" placeholder="Deixe em branco para escolher depois" class="h-9 rounded-md border border-input bg-transparent px-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary">
         </label>
 
-        <button type="submit">Conectar</button>
+        <div class="flex items-end">
+            <button type="submit" class="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90">Conectar</button>
+        </div>
     </form>
 </section>
 
-<section class="card">
-    <h2>Conexoes ativas na sessao</h2>
+<section class="rounded-lg border border-border bg-card p-6 shadow-sm">
+    <h2 class="mb-4 text-base font-semibold">Conexoes ativas na sessao</h2>
     <?php if ($connections === []): ?>
-        <p class="muted">Nenhuma conexao cadastrada ainda nesta sessao.</p>
+        <p class="text-sm text-muted-foreground">Nenhuma conexao cadastrada ainda nesta sessao.</p>
     <?php else: ?>
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Rotulo</th>
-                    <th>Tipo</th>
-                    <th>Host</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($connections as $conn): ?>
-                    <tr>
-                        <td><?= e($conn->label) ?></td>
-                        <td><?= e($drivers[$conn->driver] ?? $conn->driver) ?></td>
-                        <td><?= e($conn->host) ?></td>
-                        <td class="actions">
-                            <a href="/connections/<?= e($conn->id) ?>/databases">Ver databases</a>
-                            <form method="post" action="/connections/<?= e($conn->id) ?>/delete" onsubmit="return confirm('Remover esta conexao da sessao?');">
-                                <?= \App\Support\Csrf::field() ?>
-                                <button type="submit" class="link-danger">Remover</button>
-                            </form>
-                        </td>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="border-b border-border text-left text-muted-foreground">
+                        <th class="py-2 pr-4 font-medium">Rotulo</th>
+                        <th class="py-2 pr-4 font-medium">Tipo</th>
+                        <th class="py-2 pr-4 font-medium">Host</th>
+                        <th class="py-2 pr-4 font-medium"></th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php foreach ($connections as $conn): ?>
+                        <tr class="border-b border-border last:border-0 hover:bg-muted/50">
+                            <td class="py-2 pr-4"><?= e($conn->label) ?></td>
+                            <td class="py-2 pr-4">
+                                <span class="rounded border border-border px-1.5 py-0.5 text-xs uppercase text-muted-foreground"><?= e($drivers[$conn->driver] ?? $conn->driver) ?></span>
+                            </td>
+                            <td class="py-2 pr-4 text-muted-foreground"><?= e($conn->host) ?></td>
+                            <td class="py-2 pr-4">
+                                <div class="flex items-center gap-3">
+                                    <a class="text-primary hover:underline" href="/connections/<?= e($conn->id) ?>/databases">Ver databases</a>
+                                    <form method="post" action="/connections/<?= e($conn->id) ?>/delete" onsubmit="return confirm('Remover esta conexao da sessao?');">
+                                        <?= \App\Support\Csrf::field() ?>
+                                        <button type="submit" class="text-destructive hover:underline">Remover</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
     <?php endif; ?>
 </section>
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Database\DriverInterface;
 use App\Http\Request;
 use App\Support\Flash;
 
@@ -22,6 +23,8 @@ final class QueryController extends Controller
             '/connections/' . $profile->id . '/databases'
         );
 
+        $tables = $this->listTablesQuietly($driver);
+
         $this->view('query/run', [
             'title' => 'Executar SQL - ' . $params['db'],
             'profile' => $profile,
@@ -29,7 +32,8 @@ final class QueryController extends Controller
             'sql' => '',
             'result' => null,
             'error' => null,
-        ] + $this->sidebarData($profile, null, null, $driver));
+            'schema' => $this->buildSchema($driver, $tables),
+        ] + $this->sidebarData($profile, null, $tables, $driver));
     }
 
     /**
@@ -61,6 +65,8 @@ final class QueryController extends Controller
             }
         }
 
+        $tables = $this->listTablesQuietly($driver);
+
         $this->view('query/run', [
             'title' => 'Executar SQL - ' . $params['db'],
             'profile' => $profile,
@@ -68,6 +74,37 @@ final class QueryController extends Controller
             'sql' => $sql,
             'result' => $result,
             'error' => $error,
-        ] + $this->sidebarData($profile, null, null, $driver));
+            'schema' => $this->buildSchema($driver, $tables),
+        ] + $this->sidebarData($profile, null, $tables, $driver));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function listTablesQuietly(DriverInterface $driver): array
+    {
+        try {
+            return $driver->listTables();
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
+     * @param array<int, string> $tables
+     * @return array<string, array<int, string>>
+     */
+    private function buildSchema(DriverInterface $driver, array $tables): array
+    {
+        $schema = [];
+        foreach ($tables as $t) {
+            try {
+                $schema[$t] = array_map(static fn (array $c): string => $c['name'], $driver->listColumns($t));
+            } catch (\Throwable $e) {
+                continue;
+            }
+        }
+
+        return $schema;
     }
 }

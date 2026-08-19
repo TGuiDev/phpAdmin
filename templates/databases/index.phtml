@@ -1,15 +1,20 @@
-<h1>Databases em <?= e($profile->label) ?></h1>
-
-<p><a href="/">&larr; Voltar para conexoes</a></p>
+<h1 class="mb-1 text-xl font-semibold">Databases em <?= e($profile->label) ?></h1>
+<p class="mb-4 text-sm">
+    <a href="/" class="text-primary hover:underline">&larr; Voltar para conexoes</a>
+</p>
 
 <?php if ($databases === []): ?>
-    <p class="muted">Nenhum database encontrado.</p>
+    <p class="text-sm text-muted-foreground">Nenhum database encontrado.</p>
 <?php else: ?>
-    <ul class="list">
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <?php foreach ($databases as $db): ?>
-            <li>
-                <a href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($db) ?>/tables"><?= e($db) ?></a>
-            </li>
+            <a
+                href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($db) ?>/tables"
+                class="rounded-lg border border-border bg-card p-4 shadow-sm transition hover:border-primary hover:bg-muted/50"
+            >
+                <div class="font-medium text-foreground"><?= e($db) ?></div>
+                <div class="mt-1 text-xs text-muted-foreground">Ver tabelas &rarr;</div>
+            </a>
         <?php endforeach; ?>
-    </ul>
+    </div>
 <?php endif; ?>
