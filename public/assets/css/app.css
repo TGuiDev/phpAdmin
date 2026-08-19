@@ -65,9 +65,112 @@ a:hover {
     font-weight: 600;
 }
 
+.app-shell {
+    display: flex;
+    align-items: flex-start;
+    min-height: calc(100vh - 3.2rem);
+}
+
+.sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 1rem 0.75rem;
+    position: sticky;
+    top: 0;
+    align-self: stretch;
+    overflow-y: auto;
+}
+
+.sidebar-section + .sidebar-section {
+    margin-top: 1.25rem;
+}
+
+.sidebar-section h2 {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin: 0 0 0.5rem;
+}
+
+.sidebar-action {
+    margin: 0 0 0.5rem;
+    font-size: 0.85rem;
+}
+
+.sidebar-tree {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar-tree li {
+    border-radius: var(--radius);
+}
+
+.sidebar-tree a {
+    display: block;
+    padding: 0.35rem 0.5rem;
+    border-radius: var(--radius);
+    color: var(--text);
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-tree a:hover {
+    background: var(--surface-alt);
+    text-decoration: none;
+}
+
+.sidebar-tree li.active > a {
+    background: var(--accent);
+    color: #fff;
+}
+
+.sidebar-tree--nested {
+    padding-left: 0.85rem;
+    margin-top: 0.25rem;
+    border-left: 1px solid var(--border);
+}
+
+.sidebar-tag {
+    margin-left: 0.35rem;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.sidebar-tree li.active .sidebar-tag {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.sidebar-empty {
+    padding: 0.35rem 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+@media (max-width: 720px) {
+    .app-shell {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        position: static;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+}
+
 .container {
-    max-width: 1100px;
-    margin: 0 auto;
+    flex: 1;
+    min-width: 0;
     padding: 1.5rem;
 }
 

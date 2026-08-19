@@ -28,6 +28,6 @@ final class DatabaseController extends Controller
             'title' => 'Databases - ' . $profile->label,
             'profile' => $profile,
             'databases' => $databases,
-        ]);
+        ] + $this->sidebarData($profile, $databases));
     }
 }
