@@ -30,7 +30,7 @@ final class TableController extends Controller
             'profile' => $profile,
             'database' => $params['db'],
             'tables' => $tables,
-        ]);
+        ] + $this->sidebarData($profile, null, $tables, $driver));
     }
 
     /**
@@ -83,7 +83,7 @@ final class TableController extends Controller
             'orderDir' => $orderDir,
             'whereFilter' => $whereFilter,
             'baseUrl' => $baseUrl,
-        ]);
+        ] + $this->sidebarData($profile, null, null, $driver));
     }
 
     /**
@@ -104,7 +104,7 @@ final class TableController extends Controller
             'columns' => $columns,
             'primaryKeys' => $primaryKeys,
             'baseUrl' => $baseUrl,
-        ]);
+        ] + $this->sidebarData($profile, null, null, $driver));
     }
 
     /**
@@ -125,7 +125,7 @@ final class TableController extends Controller
             'mode' => 'create',
             'row' => [],
             'baseUrl' => $baseUrl,
-        ]);
+        ] + $this->sidebarData($profile, null, null, $driver));
     }
 
     /**
@@ -174,7 +174,7 @@ final class TableController extends Controller
             'row' => $row,
             'primaryKeyValues' => $primaryKeyValues,
             'baseUrl' => $baseUrl,
-        ]);
+        ] + $this->sidebarData($profile, null, null, $driver));
     }
 
     /**

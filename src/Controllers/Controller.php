@@ -85,4 +85,36 @@ abstract class Controller
             $this->redirect($fallbackUrl);
         }
     }
+
+    /**
+     * @return array{connections: array<int, ConnectionProfile>, databases: array<int, string>, tables: array<int, string>}
+     */
+    protected function sidebarData(
+        ?ConnectionProfile $activeProfile = null,
+        ?array $databases = null,
+        ?array $tables = null,
+        ?DriverInterface $driverForListing = null
+    ): array {
+        if ($databases === null && $activeProfile !== null && $driverForListing !== null) {
+            try {
+                $databases = $driverForListing->listDatabases();
+            } catch (\Throwable $e) {
+                $databases = [];
+            }
+        }
+
+        if ($tables === null && $activeProfile !== null && $driverForListing !== null) {
+            try {
+                $tables = $driverForListing->listTables();
+            } catch (\Throwable $e) {
+                $tables = [];
+            }
+        }
+
+        return [
+            'connections' => $this->connections->all(),
+            'databases' => $databases ?? [],
+            'tables' => $tables ?? [],
+        ];
+    }
 }

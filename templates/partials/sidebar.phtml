@@ -1,0 +1,56 @@
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <h2>Conexoes</h2>
+        <ul class="sidebar-tree">
+            <?php if (($connections ?? []) === []): ?>
+                <li class="sidebar-empty">Nenhuma conexao salva</li>
+            <?php else: ?>
+                <?php foreach ($connections as $connection): ?>
+                    <li class="<?= isset($profile) && $profile->id === $connection->id ? 'active' : '' ?>">
+                        <a href="/connections/<?= e($connection->id) ?>/databases">
+                            <?= e($connection->label) ?>
+                            <span class="sidebar-tag"><?= e($connection->driver) ?></span>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </ul>
+    </div>
+
+    <?php if (isset($profile)): ?>
+        <div class="sidebar-section">
+            <h2>Databases</h2>
+            <ul class="sidebar-tree sidebar-tree--nested">
+                <?php if (($databases ?? []) === []): ?>
+                    <li class="sidebar-empty">Nenhum database</li>
+                <?php else: ?>
+                    <?php foreach ($databases as $db): ?>
+                        <li class="<?= isset($database) && $database === $db ? 'active' : '' ?>">
+                            <a href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($db) ?>/tables"><?= e($db) ?></a>
+                        </li>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </ul>
+        </div>
+    <?php endif; ?>
+
+    <?php if (isset($profile) && isset($database)): ?>
+        <div class="sidebar-section">
+            <h2>Tabelas</h2>
+            <p class="sidebar-action">
+                <a href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/query">Executar SQL</a>
+            </p>
+            <ul class="sidebar-tree sidebar-tree--nested">
+                <?php if (($tables ?? []) === []): ?>
+                    <li class="sidebar-empty">Nenhuma tabela</li>
+                <?php else: ?>
+                    <?php foreach ($tables as $t): ?>
+                        <li class="<?= isset($table) && $table === $t ? 'active' : '' ?>">
+                            <a href="/connections/<?= e($profile->id) ?>/databases/<?= rawurlencode($database) ?>/tables/<?= rawurlencode($t) ?>"><?= e($t) ?></a>
+                        </li>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </ul>
+        </div>
+    <?php endif; ?>
+</aside>

@@ -15,6 +15,12 @@ final class QueryController extends Controller
     public function form(Request $request, array $params): void
     {
         $profile = $this->requireProfile($params['id']);
+        $baseDriver = $this->connectOrRedirect($profile);
+        $driver = $this->withDatabaseOrRedirect(
+            $baseDriver,
+            $params['db'],
+            '/connections/' . $profile->id . '/databases'
+        );
 
         $this->view('query/run', [
             'title' => 'Executar SQL - ' . $params['db'],
@@ -23,7 +29,7 @@ final class QueryController extends Controller
             'sql' => '',
             'result' => null,
             'error' => null,
-        ]);
+        ] + $this->sidebarData($profile, null, null, $driver));
     }
 
     /**
@@ -62,6 +68,6 @@ final class QueryController extends Controller
             'sql' => $sql,
             'result' => $result,
             'error' => $error,
-        ]);
+        ] + $this->sidebarData($profile, null, null, $driver));
     }
 }

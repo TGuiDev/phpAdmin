@@ -26,7 +26,7 @@ final class ConnectionController extends Controller
                 DriverFactory::POSTGRES => DriverFactory::defaultPort(DriverFactory::POSTGRES),
                 DriverFactory::SQLSERVER => DriverFactory::defaultPort(DriverFactory::SQLSERVER),
             ],
-        ]);
+        ] + $this->sidebarData());
     }
 
     /**
